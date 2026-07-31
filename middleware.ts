@@ -31,17 +31,20 @@ export async function middleware(request: NextRequest) {
     },
   );
 
+  // 1. Refresh session if expired
   const {
     data: { user },
   } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
 
+  // 2. Protect /listings (Requires any logged-in user)
   if (path.startsWith("/listings")) {
     if (!user) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
   }
 
+  // 3. Protect /admin Routes (Requires admin role verification)
   if (path.startsWith("/admin")) {
     if (!user) {
       return NextResponse.redirect(new URL("/admin-login", request.url));
