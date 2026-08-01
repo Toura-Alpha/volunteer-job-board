@@ -3,9 +3,15 @@ import { LogOut, User } from "lucide-react";
 
 interface NavbarProps {
   userEmail?: string | null;
+  isAdminRoute?: boolean;
+  isAdmin?: boolean;
 }
 
-export default function Navbar({ userEmail }: NavbarProps) {
+export default function Navbar({
+  userEmail,
+  isAdminRoute,
+  isAdmin,
+}: NavbarProps) {
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -21,6 +27,22 @@ export default function Navbar({ userEmail }: NavbarProps) {
         <div className="flex items-center space-x-4">
           {userEmail ? (
             <div className="flex items-center space-x-4">
+              {isAdmin &&
+                (isAdminRoute ? (
+                  <Link
+                    href="/app/listings"
+                    className="text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    Back To Listings
+                  </Link>
+                ) : (
+                  <Link
+                    href="../app/admin/dashboard"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    Admin Portal
+                  </Link>
+                ))}
               <Link
                 href="/profile"
                 className="p-2 text-gray-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-full transition-all"
@@ -29,9 +51,9 @@ export default function Navbar({ userEmail }: NavbarProps) {
                 <User className="w-5 h-5" />
               </Link>
 
-              <span className="text-sm text-gray-600 hidden sm:inline">
+              {/* <span className="text-sm text-gray-600 hidden sm:inline">
                 {userEmail}
-              </span>
+              </span> */}
 
               <form action="/auth/signout" method="post">
                 <button
