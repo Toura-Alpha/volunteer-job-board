@@ -5,6 +5,7 @@ import {
   Users,
   ArrowLeft,
   Shield,
+  UserCog,
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -43,6 +44,13 @@ export default function AdminSidebar() {
         >
           <Users className="w-5 h-5 text-cyan-400" />
           <span>Review Applications</span>
+        </Link>
+        <Link
+          href="/admin/dashboard/users"
+          className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+        >
+          <UserCog className="w-5 h-5 text-amber-400" />
+          <span>User Management</span>
         </Link>
       </nav>
 
