@@ -64,8 +64,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Scaling to 100k Listings & 50k Users
 
 At that size, standard queries start to lag, so here is exactly how I would handle the scaling:
+
 Optimizing Search & Indexes: I would immediately add proper indexes to high-traffic filter columns like location and created_at. For searching titles and descriptions, I’d ditch basic text matching and set up PostgreSQL’s native tsvector full-text search to keep searches lightning-fast.
+
 Switching to Cursor Pagination: Relying on standard offset pagination (range()) becomes incredibly inefficient the deeper a user scrolls. Swapping this out for cursor-based pagination ensures that querying page 100 takes the exact same fraction of a second as page 1.
+
 Caching the Heavy Hitters: Since job and volunteer boards are usually read-heavy, I’d introduce a caching layer. Implementing Redis or leveraging Next.js Incremental Static Regeneration (ISR) for public pages would shield our primary Postgres database from repetitive, unnecessary read loads.
 
 ---
