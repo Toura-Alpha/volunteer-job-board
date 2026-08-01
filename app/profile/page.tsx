@@ -1,27 +1,6 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar";
-import { updateProfile } from "@/app/actions/profile";
-
-async function createClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
-            cookieStore.set(name, value, options),
-          );
-        },
-      },
-    },
-  );
-}
+import { createClient } from "@/lib/supabase/server";
+import Link from "next/link";
+import { ArrowLeft, User, Shield, Mail, Calendar } from "lucide-react";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -29,93 +8,87 @@ export default async function ProfilePage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user?.id)
-    .single();
+  let profile = null;
+  if (user) {
+    const { data } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+    profile = data;
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar userEmail={user?.email} />
-
-      <main className="max-w-2xl mx-auto px-4 py-12">
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
-            User Profile
-          </h1>
-
-          <form action={updateProfile} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                disabled
-                value={user?.email || ""}
-                className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Full Name
-              </label>
-              <input
-                name="fullName"
-                type="text"
-                defaultValue={profile?.full_name || ""}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-emerald-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Bio
-              </label>
-              <textarea
-                name="bio"
-                rows={3}
-                defaultValue={profile?.bio || ""}
-                className="w-full p-2 border border-gray-300 rounded-lg focus:ring-emerald-500"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phone
-                </label>
-                <input
-                  name="phone"
-                  type="tel"
-                  defaultValue={profile?.phone || ""}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-emerald-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Location
-                </label>
-                <input
-                  name="location"
-                  type="text"
-                  defaultValue={profile?.location || ""}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-emerald-500"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors"
-            >
-              Save Profile
-            </button>
-          </form>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-2xl mx-auto space-y-6">
+        {/* Back to Home Button */}
+        <div>
+          <Link
+            href="/listings"
+            className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-emerald-600 bg-white border border-gray-200 px-4 py-2 rounded-xl shadow-sm transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Home</span>
+          </Link>
         </div>
-      </main>
+
+        {/* Profile Card */}
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-6">
+          <div className="flex items-center space-x-4 border-b border-gray-100 pb-6">
+            <div className="w-16 h-16 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center border border-emerald-100">
+              <User className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Account Profile
+              </h1>
+              <p className="text-sm text-gray-500">
+                Manage your account information and role settings.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center space-x-3 text-gray-600">
+                <Mail className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-medium">Email Address</span>
+              </div>
+              <span className="text-sm font-semibold text-gray-900">
+                {user?.email}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center space-x-3 text-gray-600">
+                <Shield className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-medium">System Role</span>
+              </div>
+              <span
+                className={`text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider ${
+                  profile?.role === "admin"
+                    ? "bg-indigo-50 text-indigo-700 border border-indigo-100"
+                    : "bg-emerald-50 text-emerald-700 border border-emerald-100"
+                }`}
+              >
+                {profile?.role || "applicant"}
+              </span>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <div className="flex items-center space-x-3 text-gray-600">
+                <Calendar className="w-5 h-5 text-gray-400" />
+                <span className="text-sm font-medium">Member Since</span>
+              </div>
+              <span className="text-sm text-gray-600">
+                {user?.created_at
+                  ? new Date(user.created_at).toLocaleDateString()
+                  : "N/A"}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
