@@ -4,9 +4,10 @@ import { User, LogOut, Shield } from "lucide-react";
 
 interface NavbarProps {
   isAdminRoute?: boolean;
+  userEmail?: string;
 }
 
-export default async function Navbar({ isAdminRoute }: NavbarProps) {
+export default async function Navbar({ isAdminRoute, userEmail }: NavbarProps) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -32,6 +33,7 @@ export default async function Navbar({ isAdminRoute }: NavbarProps) {
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      {userEmail && <span>Welcome, {userEmail}</span>}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center space-x-3">
           <Link
