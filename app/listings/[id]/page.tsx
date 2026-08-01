@@ -2,6 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
+import Link from "next/link";
+
 import {
   MapPin,
   Calendar,
@@ -79,14 +81,15 @@ export default async function ListingDetailPage({ params }: PageProps) {
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Back button */}
+        {/* Back button */}
         <div className="mb-6">
-          <a
+          <Link
             href="/listings"
             className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-emerald-600 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to Listings
-          </a>
+          </Link>
         </div>
 
         {/* Listing Header Card */}
@@ -151,7 +154,13 @@ export default async function ListingDetailPage({ params }: PageProps) {
               ✓ You have already successfully applied for this position.
             </div>
           ) : (
-            <form action={submitApplication} className="space-y-6">
+            <form
+              action={async (formData) => {
+                "use server";
+                await submitApplication(formData);
+              }}
+              className="space-y-6"
+            >
               <input type="hidden" name="listingId" value={listing.id} />
 
               <div>
